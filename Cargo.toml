@@ -1,0 +1,21 @@
+[workspace]
+members = ["blur_plugin","image_processor", "mirror_plugin"]
+resolver = "3"
+
+[workspace.dependencies]
+anyhow = "1"
+
+[profile.release]
+panic = "abort"
+opt-level = "z"
+
+[workspace.lints.rust]
+deprecated = "warn"
+missing_debug_implementations = "warn"
+missing_docs = "warn"
+nonstandard_style = "warn"
+redundant_lifetimes = "warn"
+unreachable_pub = "warn"
+unsafe_code = "warn"
+unused_crate_dependencies = "warn"
+unused_must_use = "warn"

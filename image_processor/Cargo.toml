@@ -1,0 +1,19 @@
+[package]
+name = "image_processor"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+description = "CLI image processing application with dynamically loadable plugins via FFI."
+
+[lints]
+workspace = true
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+# Workspace
+anyhow.workspace = true
+
+[[bin]]
+name = "iproc"
+path = "src/main.rs"
