@@ -2,5 +2,15 @@
 name = "mirror_plugin"
 version = "0.1.0"
 edition = "2024"
+links = "src/mirror_plugin.c"
 
 [dependencies]
+
+[build-dependencies]
+anyhow.workspace = true
+bindgen.workspace = true
+cc.workspace = true
+
+[lib]
+name = "mirror_plugin"
+crate-type = ["cdylib"]

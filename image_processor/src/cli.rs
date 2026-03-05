@@ -2,11 +2,29 @@
 //!
 //! Создано с помощью `clap`.
 
-use clap::Parser;
-use std::path::PathBuf;
+use clap::{Parser, ValueEnum};
+use std::{
+    fmt::{Display, Result as FmtResult},
+    path::PathBuf,
+};
+
+/// Supported plugins.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Plugins {
+    /// Mirror image flip.
+    Mirror,
+}
+
+impl Display for Plugins {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> FmtResult {
+        match self {
+            Plugins::Mirror => write!(f, "mirror"),
+        }
+    }
+}
 
 #[derive(Debug, Parser)]
-#[clap(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None)]
 pub(crate) struct CliArgParser {
     /// Path to source PNG image.
     #[clap(short, long, value_parser=validate_exists_png_file)]
@@ -22,11 +40,11 @@ pub(crate) struct CliArgParser {
 
     /// Path to the directory containing the plugin (default: `target/debug`).
     #[clap(short = 'P', long, value_parser=validate_exists_dir)]
-    pub(crate) plugin_path: Option<PathBuf>,
+    plugin_path: Option<PathBuf>,
 
     /// Plugin name (dynamic library name without extension, e.g., invert).
-    #[clap(long)]
-    pub(crate) plugin: String,
+    #[clap(value_enum)]
+    plugin: Plugins,
 }
 
 /// Валидатор для [`CliArgParser`]: проверка существования директории.
@@ -68,17 +86,17 @@ fn validate_exists_png_file(file_path: &str) -> Result<PathBuf, String> {
 impl CliArgParser {
     /// Получить нормализованные параметры из командной строки.
     pub(crate) fn get_args() -> Self {
-        Self::parse().normalize_plugin_path()
+        Self::parse()
     }
 
-    /// Заполнить `plugin_path` значением по умолчанию (`target/debug`), если
-    /// отсутствует.
-    fn normalize_plugin_path(mut self) -> Self {
-        self.plugin_path.get_or_insert_with(|| {
+    /// Предоставить путь к директории с плагином.
+    ///
+    /// Если `plugin_path` отсутствует, формируется путь к `target/debug`.
+    pub(crate) fn get_plugin_path(&self) -> PathBuf {
+        self.plugin_path.clone().unwrap_or_else(|| {
             PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("target")
                 .join("debug")
-        });
-        self
+        })
     }
 }
