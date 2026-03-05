@@ -3,6 +3,7 @@
 //! Создано с помощью `clap`.
 
 use clap::{Parser, ValueEnum};
+use image::ImageFormat;
 use std::{
     fmt::{Display, Result as FmtResult},
     path::PathBuf,
@@ -10,7 +11,7 @@ use std::{
 
 /// Supported plugins.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Plugins {
+pub(crate) enum Plugins {
     /// Mirror image flip.
     Mirror,
 }
@@ -71,10 +72,9 @@ fn validate_exists_file(file_path: &str) -> Result<PathBuf, String> {
 /// соответствия расширения (подлинность формату не проверяется).
 fn validate_exists_png_file(file_path: &str) -> Result<PathBuf, String> {
     let file = validate_exists_file(file_path)?;
-    let is_png = file
-        .extension()
-        .and_then(|s| s.to_str())
-        .is_some_and(|ext| ext.eq_ignore_ascii_case("png"));
+    let is_png = ImageFormat::from_path(&file)
+        .map_err(|e| e.to_string())?
+        .eq(&ImageFormat::Png);
 
     if is_png {
         Ok(file)
@@ -98,5 +98,10 @@ impl CliArgParser {
                 .join("target")
                 .join("debug")
         })
+    }
+    
+    /// Вернуть имя плагина в строковом представлении.
+    pub(crate) fn plugin_name(&self) -> String {
+        self.plugin.to_string()
     }
 }

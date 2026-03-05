@@ -1,5 +1,4 @@
 use anyhow::{Context, Result as AnyhowResult};
-use bindgen;
 use std::{env, path::PathBuf};
 
 fn main() -> AnyhowResult<()> {

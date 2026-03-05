@@ -2,22 +2,21 @@
 //! подключаемых плагинов через FFI.
 
 mod cli;
-use anyhow::{Context, Result as AnyhowResult};
+mod config;
+mod images;
+mod plugins_loader;
+
+use crate::{images::get_as_rgba8, plugins_loader::PluginLoader};
+use anyhow::Result as AnyhowResult;
 use cli::CliArgParser;
-use image::ImageReader;
 
 fn main() -> AnyhowResult<()> {
     let cli_args = CliArgParser::get_args();
 
-    let image = ImageReader::open(&cli_args.input)
-        .with_context(|| {
-            format!(
-                "Ошибка чтения файла изображения: {}",
-                &cli_args.input.to_string_lossy()
-            )
-        })?
-        .decode()
-        .with_context(|| "Неподдерживаемый формат изображения")?;
+    let rgba8_img = get_as_rgba8(&cli_args.input)?;
+    let plug_loader = PluginLoader::new(&cli_args.plugin_name(), &cli_args.get_plugin_path())?;
+
+    let _update_rgba8_img = plug_loader.process_image(&rgba8_img)?;
 
     Ok(())
 }
