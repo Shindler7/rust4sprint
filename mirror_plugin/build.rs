@@ -1,17 +1,8 @@
-use anyhow::{Context, Result as AnyhowResult};
-use std::{env, path::PathBuf};
+use anyhow::Result as AnyhowResult;
 
 fn main() -> AnyhowResult<()> {
-    let bindings = bindgen::builder()
-        .header("src/mirror_plugin.h")
-        .generate()
-        .with_context(|| "failed to generate bindings")?;
-
-    let out_dir = env::var("OUT_DIR").expect("OUT_DIR not set");
-    let out_path = PathBuf::from(out_dir).join("mirror_plugin.rs");
-    bindings
-        .write_to_file(out_path)
-        .with_context(|| "failed to write bindings")?;
+    println!("cargo:rerun-if-changed=src/mirror_plugin.c");
+    println!("cargo:rerun-if-changed=build.rs");
 
     cc::Build::new()
         .file("src/mirror_plugin.c")

@@ -2,5 +2,9 @@
 name = "blur_plugin"
 version = "0.1.0"
 edition = "2024"
+description = "Image blurring plugin for iproc."
 
 [dependencies]
+
+[lib]
+crate-type = ["cdylib"]
